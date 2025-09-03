@@ -1,0 +1,285 @@
+import { StyleSheet } from "react-native";
+
+export default StyleSheet.create({
+  indexContainer: {
+    flex: 1,
+    padding: 0,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  indexListContainer: {
+    paddingBottom: 80,
+  },
+  indexButtonContainer: {
+    position: "absolute",
+    bottom: 5,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  indexAddButton: {
+    backgroundColor: "#FFD700",
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  IndexAddButtonText: {
+    color: "#000000ff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  ProductModalKeyboard: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    padding: 5,
+    zIndex: 1000,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  ProductModalCard: {
+    width: "90%",
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0ff",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#000",
+    justifyContent: "space-between",
+    marginTop: 50, // ajusta quanto ele "sobe"
+    maxHeight: "80%",
+  },
+  ProductModalImage: {
+    width: "100%",
+    height: 90,
+    marginBottom: 5,
+  },
+  ProductModalInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 5,
+    borderRadius: 6,
+    marginBottom: 10,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  ProductModalDescricaoInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 6,
+    padding: 5,
+    minHeight: 70,
+    maxHeight: 70,
+    backgroundColor: "#fff",
+    textAlignVertical: "top",
+    scrollEnabled: true,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  ProductModalButtonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  ProductModalButton: {
+    flex: 1,
+    backgroundColor: "#FFD700",
+    padding: 5,
+    borderRadius: 5,
+    alignItems: "center",
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  ProductModalCancel: {
+    backgroundColor: "#ddd",
+  },
+  ProductModalButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#000",
+  },
+  ProductModalTipoButton: {
+    backgroundColor: "#FFD700",
+    borderRadius: 6,
+    alignItems: "center",
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 5,
+  },
+
+  TagsModalOverlay: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    top: 130,
+    zIndex: 9999,
+  },
+  TagsModalContainer: {
+    width: "70%",
+    maxHeight: "80%",
+    backgroundColor: "#ddd",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 6,
+    padding: 5,
+  },
+  TagsModalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  TagsModalTagList: {
+    marginBottom: 5,
+    maxHeight: 5 * 34,
+  },
+  TagsModalTagRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 2,
+    paddingHorizontal: 5,
+    marginBottom: 2,
+    borderRadius: 2,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 6,
+  },
+  TagsModalTagText: {
+    fontSize: 12,
+  },
+  TagsModalDeleteButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 4,
+    left: 2,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  TagsModalDeleteButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  TagsModalInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 3,
+  },
+  TagsModalInput: {
+    backgroundColor: "#fff",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 6,
+    padding: 6,
+    marginRight: 3,
+  },
+  TagsModalAddButton: {
+    backgroundColor: "#FFD700",
+    padding: 6,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 6,
+  },
+  TagsModalAddButtonText: {
+    fontWeight: "600",
+    color: "#000",
+  },
+  TagsModalCloseButton: {
+    alignSelf: "center",
+    marginTop: 5,
+  },
+  TagsModalCloseButtonText: {
+    fontSize: 12,
+    color: "#000",
+    fontWeight: "500",
+    backgroundColor: "#FFD700",
+    padding: 3,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 6,
+  },
+
+  ProductCardContainer: {
+    width: "33.3%",
+    backgroundColor: "#f9f9f9",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 5,
+    padding: 3,
+    alignItems: "center",
+  },
+
+  ProductCardImage: {
+    width: "100%",
+    height: 110,
+    borderRadius: 5,
+  },
+
+  ProductCardTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginBottom: 5,
+    textAlign: "center",
+  },
+
+  ProductCardTagBadge: {
+    paddingHorizontal: 5,
+    borderRadius: 5,
+  },
+
+  ProductCardTagText: {
+    fontSize: 10,
+    fontWeight: "500",
+    color: "#000",
+  },
+
+  ProductCardPrice: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+
+  ProductCardButtonRow: {
+    flexDirection: "row",
+    width: "100%",
+  },
+
+  ProductCardEditButton: {
+    flex: 1,
+    backgroundColor: "#FFD700",
+    paddingVertical: 5,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  ProductCardEditButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#000",
+  },
+
+  ProductCardRemoveButton: {
+    flex: 1,
+    backgroundColor: "#ff4d4d",
+    paddingVertical: 5,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  ProductCardRemoveButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#fff",
+  },
+});
