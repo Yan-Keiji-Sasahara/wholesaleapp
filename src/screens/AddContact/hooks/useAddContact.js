@@ -87,7 +87,6 @@ export const useAddContact = () => {
 
       Alert.alert("Sucesso", `${userToAdd.nome || "Usuário"} adicionado!`);
     } catch (error) {
-      console.error("Erro ao adicionar contato:", error);
       Alert.alert("Erro", "Não foi possível adicionar o contato.");
     }
   };

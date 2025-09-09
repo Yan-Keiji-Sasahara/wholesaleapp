@@ -11,9 +11,8 @@ export const useChat = (contact) => {
   const flatListRef = useRef(null);
 
   const userEmail = useMemo(() => auth.currentUser?.email, []);
-  const userUid = useMemo(() => auth.currentUser?.uid, []); // Retorna UID
+  const userUid = useMemo(() => auth.currentUser?.uid, []);
 
-  // Gera o ID do chat de forma consistente
   const chatId = useMemo(() => {
     if (!userUid || !contact?.id) return null;
     return userUid < contact.id
@@ -21,7 +20,6 @@ export const useChat = (contact) => {
       : `${contact.id}_${userUid}`;
   }, [userUid, contact?.id]);
 
-  // Sincroniza mensagens em tempo real
   useEffect(() => {
     if (!userEmail || !chatId) {
       setLoading(false);
@@ -54,7 +52,6 @@ export const useChat = (contact) => {
     return () => unsubscribe();
   }, [userEmail, chatId]);
 
-  // Envia nova mensagem
   const sendMessage = useCallback(async () => {
     const trimmedInput = input.trim();
     if (!trimmedInput || !chatId || sending) return;
@@ -70,12 +67,11 @@ export const useChat = (contact) => {
         .collection("messages");
 
       await messagesRef.add({
-        sender: userUid, // Usa UID do usuário logado
+        sender: userUid,
         text: tempInput,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
-      // Atualiza dados de última mensagem e contador de não lidas
       await db
         .collection("usuarios")
         .doc(contact.id)
@@ -98,7 +94,6 @@ export const useChat = (contact) => {
     }
   }, [input, chatId, sending, userUid, contact?.id]);
 
-  // Renderiza mensagens com flag de usuário logado
   const renderMessage = useCallback(
     ({ item }) => {
       const isMyMessage = item.sender === userUid;
@@ -117,6 +112,6 @@ export const useChat = (contact) => {
     flatListRef,
     renderMessage,
     userEmail,
-    userUid, // Retorna UID para uso no Chat.js
+    userUid,
   };
 };

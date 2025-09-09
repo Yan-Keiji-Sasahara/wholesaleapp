@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
-import styles from "../../../../styles/MyCatalogStyles";
+import styles from "../../../styles/MyCatalogStyles";
 
 export default function TagsModal({
   tags,
@@ -20,14 +20,13 @@ export default function TagsModal({
   const [newTagText, setNewTagText] = useState("");
 
   const selectTag = (tag) => {
-    setNewItem({ ...newItem, tipo: tag });
+    setNewItem({ ...newItem, tipo: { id: tag.id, nome: tag.nome } });
     setTagsModalVisible(false);
   };
 
   const handleAddTag = () => {
     const trimmed = newTagText.trim();
     if (trimmed) {
-      // Adiciona tag usando a lógica do hook (cores e persistência)
       addTag({ nome: trimmed });
       setNewTagText("");
     }

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, FlatList, TouchableOpacity, Text } from "react-native";
 
 import ProductCard from "./components/ProductCard";
-import ProductModal from "./components/modals/ProductModal";
-import TagsModal from "./components/modals/TagsModal";
+import ProductModal from "./components/ProductModal";
+import TagsModal from "./components/TagsModal";
 
 import useMyCatalog from "./hooks/useMyCatalog";
 
@@ -17,8 +17,8 @@ export default function MyCatalogScreen() {
     items,
     newItem,
     setNewItem,
-    addImage, // ⚡ Já envia direto pro Cloudinary
-    saveNewItem, // Salva o produto na lista
+    addImage,
+    saveNewItem,
     removeItem,
     tags,
     addTag,
@@ -27,7 +27,6 @@ export default function MyCatalogScreen() {
     fetchUserTags,
   } = catalog;
 
-  // 🔹 Atualiza as tags do usuário sempre que o modal de tags abrir
   useEffect(() => {
     if (tagsModalVisible) {
       fetchUserTags();
@@ -36,17 +35,16 @@ export default function MyCatalogScreen() {
 
   return (
     <View style={styles.indexContainer}>
-      {/* Modal do Produto */}
       {newItem && (
         <ProductModal
           newItem={newItem}
           setNewItem={setNewItem}
           saveNewItem={saveNewItem}
+          updateItem={catalog.updateItem}
           setTagsModalVisible={setTagsModalVisible}
         />
       )}
 
-      {/* Modal de Tags */}
       {tagsModalVisible && (
         <TagsModal
           tags={tags}
@@ -58,7 +56,6 @@ export default function MyCatalogScreen() {
         />
       )}
 
-      {/* Lista de produtos */}
       <FlatList
         data={items}
         renderItem={({ item }) => (
@@ -75,13 +72,12 @@ export default function MyCatalogScreen() {
         contentContainerStyle={styles.indexListContainer}
       />
 
-      {/* Botão para adicionar novo produto */}
       {!newItem && (
         <View style={styles.indexButtonContainer}>
           <TouchableOpacity
             style={styles.indexAddButton}
             onPress={async () => {
-              await addImage(); // ⚡ Chama a função que envia a imagem para o Cloudinary
+              await addImage();
             }}
           >
             <Text style={styles.IndexAddButtonText}>Adicionar Produto</Text>

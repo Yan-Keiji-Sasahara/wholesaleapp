@@ -52,7 +52,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000",
     justifyContent: "space-between",
-    marginTop: 50, // ajusta quanto ele "sobe"
+    marginTop: 50,
     maxHeight: "80%",
   },
   ProductModalImage: {
@@ -219,6 +219,9 @@ export default StyleSheet.create({
     borderRadius: 5,
     padding: 3,
     alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    minHeight: 220,
   },
 
   ProductCardImage: {
@@ -253,6 +256,9 @@ export default StyleSheet.create({
   ProductCardButtonRow: {
     flexDirection: "row",
     width: "100%",
+    marginTop: 5,
+    justifyContent: "space-between",
+    alignSelf: "flex-end",
   },
 
   ProductCardEditButton: {

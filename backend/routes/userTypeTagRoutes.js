@@ -22,16 +22,12 @@ router.post("/addUserTypeTag", async (req, res) => {
         "INSERT INTO usuarios (id, nome, email) VALUES (?, ?, ?)",
         [usuario.id, usuario.nome, usuario.email]
       );
-      console.log(`🚀 Usuário adicionado no MySQL com ID: ${usuario.id}`);
-    } else {
-      console.log(`✅ Usuário já existe no MySQL com ID: ${userExists[0].id}`);
     }
 
     const [checkUser] = await db.execute(
       "SELECT id, email FROM usuarios WHERE id = ?",
       [usuario.id]
     );
-    console.log("🔍 Teste de ID no MySQL:", checkUser[0]);
 
     const [tagTypeExists] = await db.execute(
       "SELECT id FROM tipos WHERE usuario_id = ? AND nome = ?",
@@ -51,14 +47,10 @@ router.post("/addUserTypeTag", async (req, res) => {
 
     return res.json({ success: true, userId, tagId });
   } catch (error) {
-    console.error("❌ Erro ao adicionar usuário e tag:", error);
     return res.status(500).json({ error: error.message });
   }
 });
 
-// ======================================
-// GET para buscar tags do usuário
-// ======================================
 router.get("/getUserTags/:userId", async (req, res) => {
   const { userId } = req.params;
 
@@ -68,45 +60,34 @@ router.get("/getUserTags/:userId", async (req, res) => {
       [userId]
     );
 
-    console.log(`📝 Tags retornadas para usuário ${userId}:`, tags);
-
     return res.json({ success: true, tags });
   } catch (error) {
-    console.error("❌ Erro ao buscar tags:", error);
     return res.status(500).json({ error: error.message });
   }
 });
 
-// ======================================
-// DELETE para remover uma tag pelo ID
-// ======================================
 router.delete("/deleteUserTag/:tagId/:userId", async (req, res) => {
   const { tagId, userId } = req.params;
 
   try {
-    // Verifica se a tag existe e pertence ao usuário
     const [tagExists] = await db.execute(
       "SELECT id FROM tipos WHERE id = ? AND usuario_id = ?",
       [tagId, userId]
     );
 
     if (tagExists.length === 0) {
-      console.log(`❌ Tag ${tagId} não encontrada para o usuário ${userId}`);
       return res
         .status(404)
         .json({ error: "Tag não encontrada ou não pertence ao usuário" });
     }
 
-    // Deleta a tag
     await db.execute("DELETE FROM tipos WHERE id = ? AND usuario_id = ?", [
       tagId,
       userId,
     ]);
 
-    console.log(`✅ Tag ${tagId} deletada do usuário ${userId}`);
     return res.json({ success: true, tagId });
   } catch (error) {
-    console.error("❌ Erro ao deletar tag:", error);
     return res.status(500).json({ error: error.message });
   }
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
@@ -6,15 +6,33 @@ import {
   TouchableOpacity,
   Keyboard,
   Text,
+  ActivityIndicator,
 } from "react-native";
-import styles from "../../../../styles/MyCatalogStyles";
+import styles from "../../../styles/MyCatalogStyles";
 
 export default function ProductModal({
   newItem,
   setNewItem,
   saveNewItem,
+  updateItem,
   setTagsModalVisible,
 }) {
+  const [loading, setLoading] = useState(false);
+  const isEditing = !!newItem?.id;
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      if (isEditing) {
+        await updateItem();
+      } else {
+        await saveNewItem();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.ProductModalKeyboard}>
       <View style={styles.ProductModalCard}>
@@ -47,8 +65,9 @@ export default function ProductModal({
 
         <TextInput
           style={styles.ProductModalInput}
-          placeholder='R$ "54,50"'
+          placeholder='ex: "54,50"'
           value={newItem?.preco}
+          keyboardType="numeric"
           onChangeText={(text) => setNewItem({ ...newItem, preco: text })}
         />
 
@@ -72,9 +91,16 @@ export default function ProductModal({
 
           <TouchableOpacity
             style={styles.ProductModalButton}
-            onPress={saveNewItem}
+            onPress={handleSave}
+            disabled={loading}
           >
-            <Text style={styles.ProductModalButtonText}>Salvar Produto</Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.ProductModalButtonText}>
+                {isEditing ? "Salvar Alterações" : "Salvar Produto"}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

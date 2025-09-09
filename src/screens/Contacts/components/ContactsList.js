@@ -11,9 +11,8 @@ const ContactsList = ({
 }) => {
   const term = (searchTerm || "").toLowerCase();
 
-  // Filtra contatos válidos (com id e nome) e que batem com o termo de busca
   const filteredContacts = contacts
-    .filter((c) => c.id && c.name) // Ignora contatos sem id ou nome
+    .filter((c) => c.id && c.name)
     .filter(
       (c) =>
         c.name.toLowerCase().includes(term) || c.id.toLowerCase().includes(term)

@@ -11,14 +11,11 @@ const Stack = createNativeStackNavigator();
 const AppStack = () => (
   <ContactsProvider>
     <Stack.Navigator screenOptions={{ headerShown: true }}>
-      {/* Tabs principais */}
       <Stack.Screen
         name="MainTabs"
         component={BottomTabs}
         options={{ headerShown: false }}
       />
-
-      {/* Adicionar contato */}
       <Stack.Screen
         name="AddContact"
         component={AddContact}
@@ -29,8 +26,6 @@ const AppStack = () => (
           headerTitleStyle: { fontWeight: "bold" },
         }}
       />
-
-      {/* Chat */}
       <Stack.Screen
         name="Chat"
         component={Chat}
