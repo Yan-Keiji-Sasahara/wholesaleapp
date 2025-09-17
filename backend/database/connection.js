@@ -12,10 +12,10 @@ const db = mysql.createPool({
 
 async function testConnection() {
   try {
-    const [rows] = await db.query("SELECT 1 + 1 AS result");
+    const [rows] = await db.query("SELECT CURRENT_TIMESTAMP() as horas");
     console.log("Conexão com MySQL estabelecida com sucesso!");
     console.log("Banco de dados ativo: wholesaleapp");
-    console.log("Teste simples de query: 1 + 1 =", rows[0].result);
+    console.log("Teste simples de query:", rows[0].horas);
   } catch (err) {
     console.error("Erro ao conectar ao MySQL:", err.message);
   }

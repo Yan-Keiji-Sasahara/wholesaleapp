@@ -3,30 +3,21 @@ import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import api from "../../../services/api";
 import { auth } from "../../../firebase_config/firebase_config";
-import { uploadImageToCloudinary } from "../../../services/cloudinaryService";
 
 function getRandomPastelColor() {
   const hue = Math.floor(Math.random() * 360);
-  return `hsl(${hue}, 70%, 80%)`;
-}
-
-const handleAddTag = async (tag) => {
-  const usuario = {
-    id: auth.currentUser.uid,
-    nome: auth.currentUser.displayName,
-    email: auth.currentUser.email,
+  const saturation = 70;
+  const lightness = 80;
+  const a = saturation * Math.min(lightness / 100, 1 - lightness / 100);
+  const f = (n) => {
+    const k = (n + hue / 30) % 12;
+    const color = lightness / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color)
+      .toString(16)
+      .padStart(2, "0");
   };
-  const tagComCor = { ...tag, cor: tag.cor || getRandomPastelColor() };
-  try {
-    const res = await api.post("/api/userTag/addUserTypeTag", {
-      usuario,
-      tag: tagComCor,
-    });
-    console.log("Tag adicionada:", res.data);
-  } catch (error) {
-    console.error("Erro ao adicionar tag:", error);
-  }
-};
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
 
 export default function useMyCatalog() {
   const [items, setItems] = useState([]);
@@ -37,12 +28,10 @@ export default function useMyCatalog() {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) return;
-
       const res = await api.get(`/api/userTag/getUserTags/${userId}`);
       if (res.data.success) {
-        const userTags = res.data.tags || [];
         setTags(
-          userTags.map((t) => ({
+          (res.data.tags || []).map((t) => ({
             id: t.id,
             nome: t.nome,
             cor: t.cor || getRandomPastelColor(),
@@ -58,23 +47,24 @@ export default function useMyCatalog() {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) return;
-
       const res = await api.get(`/api/userProduct/getUserProducts/${userId}`);
       if (res.data.success) {
-        const userProducts = res.data.products.map((p) => ({
-          id: p.id.toString(),
-          title: p.titulo,
-          preco: p.preco,
-          descricao: p.descricao,
-          uri: p.imagem_uri,
-          tipo: {
-            id: p.tipo_id,
-            nome: p.tipo_nome,
-            cor: p.tipo_cor || getRandomPastelColor(),
-          },
-        }));
+        const userProducts = res.data.products.map((p) => {
+          const tagExistente = tags.find((t) => t.id === p.tipo_id);
+          return {
+            id: p.id.toString(),
+            title: p.titulo,
+            preco: p.preco,
+            descricao: p.descricao,
+            uri: p.imagem_uri,
+            tipo: {
+              id: p.tipo_id,
+              nome: p.tipo_nome,
+              cor: tagExistente?.cor || p.tipo_cor || getRandomPastelColor(),
+            },
+          };
+        });
         setItems(userProducts);
-        console.log("Produtos do usuário carregados:", userProducts);
       }
     } catch (err) {
       console.error("Erro ao buscar produtos do usuário:", err);
@@ -83,8 +73,11 @@ export default function useMyCatalog() {
 
   useEffect(() => {
     fetchUserTags();
-    fetchUserProducts();
   }, []);
+
+  useEffect(() => {
+    if (tags.length > 0) fetchUserProducts();
+  }, [tags]);
 
   const initNewItem = (uri) => {
     setNewItem({
@@ -107,78 +100,71 @@ export default function useMyCatalog() {
     });
 
     if (!result.canceled) {
-      const localUri = result.assets[0].uri;
-      initNewItem(localUri);
+      initNewItem(result.assets[0].uri);
     }
   };
 
-  const saveNewItem = async () => {
-    if (!newItem?.title || !newItem?.preco || !newItem?.tipo) {
-      alert("Preencha nome, tipo e preço.");
-      return;
-    }
-
-    let finalUrl = newItem.uri;
-    if (!finalUrl.startsWith("http")) {
-      finalUrl = await uploadImageToCloudinary(newItem.uri);
-      if (!finalUrl) {
-        Alert.alert("Erro", "Não foi possível enviar a imagem.");
-        return;
-      }
-    }
-
-    const precoFormatado = newItem.preco.replace(",", ".");
-    const tipoId = newItem.tipo.id;
-
+  const saveNewItem = async (item) => {
     try {
-      const userId = auth.currentUser.uid;
-      await api.post("/api/userProduct/createProduct", {
-        usuario_id: userId,
-        titulo: newItem.title,
-        preco: precoFormatado,
-        descricao: newItem.descricao || "",
-        tipo_id: tipoId,
-        imagem_uri: finalUrl,
+      const usuario_id = auth.currentUser.uid;
+      const res = await api.post("/api/userProduct/createProduct", {
+        usuario_id,
+        titulo: item.title,
+        preco: item.preco,
+        descricao: item.descricao,
+        tipo_id: item.tipo.id,
+        imagem_uri: item.uri,
       });
 
-      await fetchUserProducts();
-      setNewItem(null);
+      if (res.data.success) {
+        setItems((prev) => [
+          ...prev,
+          {
+            id: res.data.produtoId.toString(),
+            title: item.title,
+            preco: item.preco,
+            descricao: item.descricao,
+            uri: item.uri,
+            tipo: item.tipo,
+          },
+        ]);
+      }
     } catch (err) {
-      console.error("Erro ao enviar produto para backend:", err);
-      Alert.alert("Erro", "Não foi possível salvar o produto no backend.");
+      console.error("Erro ao salvar produto:", err);
+      Alert.alert("Erro", "Não foi possível salvar o produto.");
     }
   };
 
-  const updateItem = async () => {
-    if (newItem?.isNew) return;
-
-    const original = items.find((i) => i.id === newItem.id);
-    if (!original) {
-      console.warn("Produto não encontrado para atualizar:", newItem);
-      return;
-    }
-
-    const updates = {};
-    if (newItem.title !== original.title) updates.titulo = newItem.title;
-    if (newItem.preco !== original.preco)
-      updates.preco = newItem.preco.replace(",", ".");
-    if (newItem.descricao !== original.descricao)
-      updates.descricao = newItem.descricao;
-    if (newItem.tipo?.id !== original.tipo?.id)
-      updates.tipo_id = newItem.tipo.id;
-
-    if (Object.keys(updates).length === 0) {
-      Alert.alert("Nenhuma alteração", "Você não modificou nenhum campo.");
-      return;
-    }
-
+  const updateItem = async (item) => {
     try {
-      await api.put(`/api/userProduct/updateProduct/${newItem.id}`, updates);
-      await fetchUserProducts();
-      setNewItem(null);
+      const userId = auth.currentUser.uid;
+      const res = await api.put(`/api/userProduct/updateProduct/${item.id}`, {
+        titulo: item.title,
+        preco: item.preco,
+        descricao: item.descricao,
+        tipo_id: item.tipo.id,
+        usuario_id: auth.currentUser.uid,
+      });
+
+      if (res.data.success) {
+        setItems((prev) =>
+          prev.map((p) => (p.id === item.id ? { ...p, ...item } : p))
+        );
+      }
     } catch (err) {
       console.error("Erro ao atualizar produto:", err);
       Alert.alert("Erro", "Não foi possível atualizar o produto.");
+    }
+  };
+
+  const removeItem = async (id) => {
+    try {
+      const userId = auth.currentUser.uid;
+      await api.delete(`/api/userProduct/deleteProduct/${id}/${userId}`);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Erro ao remover produto:", err);
+      Alert.alert("Erro", "Não foi possível remover o produto.");
     }
   };
 
@@ -191,29 +177,10 @@ export default function useMyCatalog() {
         {
           text: "Remover",
           style: "destructive",
-          onPress: async () => {
-            if (newItem?.id === item.id) setNewItem(null);
-            await removeItem(item.id);
-          },
+          onPress: () => removeItem(item.id),
         },
-      ],
-      { cancelable: true }
+      ]
     );
-  };
-
-  const removeItem = async (id) => {
-    try {
-      const userId = auth.currentUser.uid;
-      await api.delete(`/api/userProduct/deleteProduct/${id}/${userId}`);
-      setItems((prev) => prev.filter((item) => item.id !== id));
-      console.log("Produto removido:", id);
-    } catch (err) {
-      console.error("Erro ao remover produto:", err);
-      Alert.alert(
-        "Erro",
-        "Não foi possível remover o produto. Tente novamente."
-      );
-    }
   };
 
   const addTag = (tag) => {
@@ -224,7 +191,22 @@ export default function useMyCatalog() {
     if (!exists) {
       const tagComCor = { ...tag, cor: tag.cor || getRandomPastelColor() };
       setTags((prev) => [...prev, tagComCor]);
-      handleAddTag(tagComCor);
+
+      (async () => {
+        try {
+          const usuario = {
+            id: auth.currentUser.uid,
+            nome: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+          };
+          await api.post("/api/userTag/addUserTypeTag", {
+            usuario,
+            tag: tagComCor,
+          });
+        } catch (err) {
+          console.error("Erro ao adicionar tag:", err);
+        }
+      })();
     }
   };
 
@@ -238,7 +220,7 @@ export default function useMyCatalog() {
       setTags((prev) => prev.filter((t) => t.id !== tagToRemove.id));
     } catch (err) {
       console.error("Erro ao deletar tag:", err);
-      Alert.alert("Erro", "Não foi possível deletar a tag. Tente novamente.");
+      Alert.alert("Erro", "Não foi possível deletar a tag.");
     }
   };
 
@@ -247,14 +229,14 @@ export default function useMyCatalog() {
     newItem,
     setNewItem,
     addImage,
+    fetchUserTags,
+    fetchUserProducts,
+    tags,
     saveNewItem,
     updateItem,
     removeItem,
     confirmRemove,
-    tags,
     addTag,
     removeTag,
-    fetchUserTags,
-    fetchUserProducts,
   };
 }

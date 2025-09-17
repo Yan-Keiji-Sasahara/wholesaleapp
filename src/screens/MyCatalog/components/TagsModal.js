@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+// import React from "react";
 import {
   Modal,
   View,
@@ -8,29 +8,23 @@ import {
   Text,
 } from "react-native";
 import styles from "../../../styles/MyCatalogStyles";
+import useTagsModal from "../hooks/useTagsModal";
 
 export default function TagsModal({
-  tags,
+  tags = [],
   addTag,
   removeTag,
   setTagsModalVisible,
   setNewItem,
   newItem,
 }) {
-  const [newTagText, setNewTagText] = useState("");
-
-  const selectTag = (tag) => {
-    setNewItem({ ...newItem, tipo: { id: tag.id, nome: tag.nome } });
-    setTagsModalVisible(false);
-  };
-
-  const handleAddTag = () => {
-    const trimmed = newTagText.trim();
-    if (trimmed) {
-      addTag({ nome: trimmed });
-      setNewTagText("");
-    }
-  };
+  const { newTagText, setNewTagText, selectTag, handleAddTag } = useTagsModal({
+    tags,
+    addTag,
+    setNewItem,
+    setTagsModalVisible,
+    newItem,
+  });
 
   return (
     <Modal
@@ -55,7 +49,7 @@ export default function TagsModal({
 
                 <TouchableOpacity
                   style={styles.TagsModalDeleteButton}
-                  onPress={() => removeTag(tag)}
+                  onPress={() => removeTag?.(tag)}
                 >
                   <Text style={styles.TagsModalDeleteButtonText}>X</Text>
                 </TouchableOpacity>

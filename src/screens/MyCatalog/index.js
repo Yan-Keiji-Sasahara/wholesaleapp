@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { View, FlatList, TouchableOpacity, Text } from "react-native";
 
 import ProductCard from "./components/ProductCard";
@@ -10,27 +10,25 @@ import useMyCatalog from "./hooks/useMyCatalog";
 import styles from "../../styles/MyCatalogStyles";
 
 export default function MyCatalogScreen() {
-  const catalog = useMyCatalog();
-  const [tagsModalVisible, setTagsModalVisible] = useState(false);
-
   const {
     items,
     newItem,
     setNewItem,
     addImage,
     saveNewItem,
+    updateItem,
     removeItem,
     tags,
     addTag,
     removeTag,
     confirmRemove,
     fetchUserTags,
-  } = catalog;
+  } = useMyCatalog();
+
+  const [tagsModalVisible, setTagsModalVisible] = useState(false);
 
   useEffect(() => {
-    if (tagsModalVisible) {
-      fetchUserTags();
-    }
+    if (tagsModalVisible) fetchUserTags();
   }, [tagsModalVisible]);
 
   return (
@@ -40,8 +38,11 @@ export default function MyCatalogScreen() {
           newItem={newItem}
           setNewItem={setNewItem}
           saveNewItem={saveNewItem}
-          updateItem={catalog.updateItem}
+          updateItem={updateItem}
           setTagsModalVisible={setTagsModalVisible}
+          addTag={addTag}
+          removeTag={removeTag}
+          tags={tags}
         />
       )}
 
@@ -58,6 +59,9 @@ export default function MyCatalogScreen() {
 
       <FlatList
         data={items}
+        keyExtractor={(item) => item.id}
+        numColumns={3}
+        contentContainerStyle={styles.indexListContainer}
         renderItem={({ item }) => (
           <ProductCard
             item={item}
@@ -67,19 +71,11 @@ export default function MyCatalogScreen() {
             confirmRemove={confirmRemove}
           />
         )}
-        keyExtractor={(item) => item.id}
-        numColumns={3}
-        contentContainerStyle={styles.indexListContainer}
       />
 
       {!newItem && (
         <View style={styles.indexButtonContainer}>
-          <TouchableOpacity
-            style={styles.indexAddButton}
-            onPress={async () => {
-              await addImage();
-            }}
-          >
+          <TouchableOpacity style={styles.indexAddButton} onPress={addImage}>
             <Text style={styles.IndexAddButtonText}>Adicionar Produto</Text>
           </TouchableOpacity>
         </View>

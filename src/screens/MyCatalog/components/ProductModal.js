@@ -1,37 +1,27 @@
-import React, { useState } from "react";
+// import React from "react";
 import {
   View,
   TextInput,
   Image,
   TouchableOpacity,
-  Keyboard,
   Text,
   ActivityIndicator,
 } from "react-native";
 import styles from "../../../styles/MyCatalogStyles";
+import useProductModal from "../hooks/useProductModal";
 
-export default function ProductModal({
-  newItem,
-  setNewItem,
-  saveNewItem,
-  updateItem,
-  setTagsModalVisible,
-}) {
-  const [loading, setLoading] = useState(false);
-  const isEditing = !!newItem?.id;
+export default function ProductModal(props) {
+  const { newItem, setNewItem, saveNewItem, updateItem, setTagsModalVisible } =
+    props;
 
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      if (isEditing) {
-        await updateItem();
-      } else {
-        await saveNewItem();
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, isEditing, handleSave, openTagsModal, cancel } =
+    useProductModal({
+      newItem,
+      setNewItem,
+      saveNewItem,
+      updateItem,
+      setTagsModalVisible,
+    });
 
   return (
     <View style={styles.ProductModalKeyboard}>
@@ -53,10 +43,7 @@ export default function ProductModal({
 
         <TouchableOpacity
           style={styles.ProductModalTipoButton}
-          onPress={() => {
-            Keyboard.dismiss();
-            setTimeout(() => setTagsModalVisible(true), 50);
-          }}
+          onPress={openTagsModal}
         >
           <Text style={styles.ProductModalButtonText}>
             {newItem?.tipo ? `Tipo: ${newItem.tipo.nome}` : "Adicionar Tipo"}
@@ -84,7 +71,7 @@ export default function ProductModal({
         <View style={styles.ProductModalButtonRow}>
           <TouchableOpacity
             style={[styles.ProductModalButton, styles.ProductModalCancel]}
-            onPress={() => setNewItem(null)}
+            onPress={cancel}
           >
             <Text style={styles.ProductModalButtonText}>Cancelar</Text>
           </TouchableOpacity>
